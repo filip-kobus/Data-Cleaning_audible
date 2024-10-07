@@ -14,8 +14,8 @@
 	*/
 
 -- 2. Loading data into table
-
-	/*
+	
+    /*
 	LOAD DATA INFILE 'audible.csv'
 	INTO TABLE audible
 	FIELDS TERMINATED BY ','
@@ -24,6 +24,8 @@
 	IGNORE 1 LINES;
 	*/
 	-- 87489 row(s) affected Records: 87489  Deleted: 0  Skipped: 0  Warnings: 0
+    
+		-- data should be located in "...\MySQL\MySQL Server 8.0\Data\database_name" folder
 
 -- 3. Getting rid of duplicates
 
@@ -36,6 +38,9 @@
 	SELECT *, ROW_NUMBER() over(partition by `name`, `author`, `narrator`, `time`, `releasedate`, `language`, `stars`, `price`) as row_num
 	FROM audible;
     
+		-- If any row has the row_num > 1, it has a duplicate
+		-- based on columns mentioned above in: over(partition by ...) function
+    
     DELETE FROM audible_staged1
     WHERE row_num > 1;
     
@@ -45,8 +50,9 @@
 
 -- 4. Cleaning author and narrator ('Writtenby:GeronimoStilton' -> 'Geronimo Stilton')
 
-	-- Created function for splitting names with spaces (doesnt work for Japaneese)
-	/*
+		-- Created function for splitting author and narrathor name (doesnt work for Japaneese)
+	
+    /*
     DELIMITER //
 
 		CREATE FUNCTION split_name(name VARCHAR(255))
@@ -83,7 +89,8 @@
 	// DELIMITER ;
     */
     
-    -- Deleted Writenby:
+		-- Deleted Writenby:
+    
     /*
 	UPDATE audible_staged1
     SET author = TRIM('Writtenby:' FROM author);
@@ -94,11 +101,13 @@
     UPDATE audible_staged1
     SET author = split_name(author)
     WHERE REGEXP_LIKE(author, '.*[a-zA-ZА-я].*') = 1;
-    -- It skips non latin and non cyrylic letters
+    
+		-- It skips non latin and non cyrylic letters
     
     UPDATE audible_staged1
     SET narrator = split_name(narrator)
     WHERE REGEXP_LIKE(narrator, '.*[a-zA-ZА-я].*') = 1;
+		-- split name only if it contains latin or cyrylic letters audible_staged1
     */
 
 -- 5. Formatting time column (7hrs and 20 minutes -> 440)
@@ -114,7 +123,7 @@
 			DECLARE minutes INT DEFAULT 0;
 			DECLARE hours INT DEFAULT 0;
 			            
-			IF time_input LIKE '%hr%' AND time_input LIKE '%min%' THEN
+            IF time_input LIKE '%hr%' AND time_input LIKE '%min%' THEN
 				SET hours = CONVERT(SUBSTRING_INDEX(SUBSTRING_INDEX(time_input, ' ', 1), ' ', -1), SIGNED INTEGER);
                 SET minutes = CONVERT(SUBSTRING_INDEX(SUBSTRING_INDEX(time_input, ' ', 4), ' ', -1), SIGNED INTEGER);
 			
@@ -146,7 +155,7 @@
     RENAME COLUMN time TO time_in_minutes;
     */
 
--- 6. Formatting language column (Capitalize language first letter)
+-- 6. Formatting language column (english -> English)
 
 	/*
 	DELIMITER //
@@ -167,7 +176,7 @@
     SET `language` = capitalize_first_letter(`language`);
     */
     
--- 6. Formatting releasedate to YYYY-MM-DD format
+-- 6. Formatting releasedate (from DD-MM-YY to YYYY-MM-DD)
     /*
     UPDATE audible_staged1
     SET releasedate = STR_TO_DATE(releasedate, '%d-%m-%Y');
@@ -176,7 +185,12 @@
     MODIFY releasedate date;
     */
 
--- 7. Formatting stars and adding ratings
+-- 7. Formatting stars and adding ratings (
+		-- from
+        -- stars: '4.5 out of 5 stars41 ratings'
+		-- to
+		-- stars_out_of_5: 4.5
+        -- ratings: 41) 
 	
 	/*
 	DELIMITER //
@@ -223,7 +237,7 @@
     MODIFY stars_out_of_5 FLOAT(1);
     */
 
--- 8. Formatting price
+-- 8. Formatting price ('1,256.00' to 1256.00)
 	
     /*
     SELECT price
@@ -241,3 +255,4 @@
     MODIFY price FLOAT(2);
 	*/
 
+	-- RENAME TABLE audible_staged1 TO audbile_cleaned;
