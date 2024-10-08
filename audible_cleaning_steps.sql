@@ -217,7 +217,7 @@
 	// DELIMITER ;
 
 	UPDATE audible_staged1
-    SET stars = NULL
+    SET stars = 0
     WHERE stars = 'Not rated yet';
     
     ALTER TABLE audible_staged1
