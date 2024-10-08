@@ -255,4 +255,4 @@
     MODIFY price FLOAT(2);
 	*/
 
-	-- RENAME TABLE audible_staged1 TO audbile_cleaned;
+	-- RENAME TABLE audible_staged1 TO audible_cleaned;
