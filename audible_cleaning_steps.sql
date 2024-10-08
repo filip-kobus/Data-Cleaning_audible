@@ -25,9 +25,18 @@
 	*/
 	-- 87489 row(s) affected Records: 87489  Deleted: 0  Skipped: 0  Warnings: 0
     
-		-- data should be located in "...\MySQL\MySQL Server 8.0\Data\database_name" folder
+	-- data should be located in "...\MySQL\MySQL Server 8.0\Data\database_name" folder
 
--- 3. Getting rid of duplicates
+-- 3. Formatting quotation marks (" -> “)
+	/*
+        UPDATE audible
+		SET `name` = REPLACE(`name`, '"', '“');
+		
+		UPDATE audible
+		SET `name` = REPLACE(`name`, '\'', '“');
+	*/
+    
+-- 4. Getting rid of duplicates
 
 	/*
 	CREATE TABLE audible_staged1 LIKE audible; 
@@ -48,7 +57,7 @@
     DROP COLUMN row_num;
     */
 
--- 4. Cleaning author and narrator ('Writtenby:GeronimoStilton' -> 'Geronimo Stilton')
+-- 5. Cleaning author and narrator ('Writtenby:GeronimoStilton' -> 'Geronimo Stilton')
 
 		-- Created function for splitting author and narrathor name (doesnt work for Japaneese)
 	
@@ -110,7 +119,7 @@
 		-- split name only if it contains latin or cyrylic letters audible_staged1
     */
 
--- 5. Formatting time column (7hrs and 20 minutes -> 440)
+-- 6. Formatting time column (7hrs and 20 minutes -> 440)
     
     -- Function that converts hrs and minutes to minutes
     
@@ -155,7 +164,7 @@
     RENAME COLUMN time TO time_in_minutes;
     */
 
--- 6. Formatting language column (english -> English)
+-- 7. Formatting language column (english -> English)
 
 	/*
 	DELIMITER //
@@ -176,7 +185,7 @@
     SET `language` = capitalize_first_letter(`language`);
     */
     
--- 6. Formatting releasedate (from DD-MM-YY to YYYY-MM-DD)
+-- 8. Formatting releasedate (from DD-MM-YY to YYYY-MM-DD)
     /*
     UPDATE audible_staged1
     SET releasedate = STR_TO_DATE(releasedate, '%d-%m-%Y');
@@ -185,7 +194,7 @@
     MODIFY releasedate date;
     */
 
--- 7. Formatting stars and adding ratings (
+-- 9. Formatting stars and adding ratings (
 		-- from
         -- stars: '4.5 out of 5 stars41 ratings'
 		-- to
@@ -237,7 +246,7 @@
     MODIFY stars_out_of_5 FLOAT(1);
     */
 
--- 8. Formatting price ('1,256.00' to 1256.00)
+-- 10. Formatting price ('1,256.00' to 1256.00)
 	
     /*
     SELECT price
@@ -255,4 +264,23 @@
     MODIFY price FLOAT(2);
 	*/
 
-	-- RENAME TABLE audible_staged1 TO audible_cleaned;
+-- 11. Exporting tables to csv
+    
+    /*
+    RENAME TABLE audible_staged1 TO audible_cleaned;
+    
+	SELECT *
+	FROM audible
+	INTO OUTFILE 'audible_uncleaned.csv'
+	FIELDS TERMINATED BY ','
+	ENCLOSED BY '"'
+	LINES TERMINATED BY '\n';
+    
+    SELECT *
+	FROM audible_cleaned
+	INTO OUTFILE 'audible_cleaned.csv'
+	FIELDS TERMINATED BY ','
+	ENCLOSED BY '"'
+	LINES TERMINATED BY '\n';
+    */
+    
