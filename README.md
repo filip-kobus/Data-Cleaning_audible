@@ -1,7 +1,3 @@
-Here is the updated README with the Kaggle profile link:
-
----
-
 # Audible Data Cleaning Project
 
 This project involves cleaning and preparing raw Audible data for further analysis. The main steps include loading the raw dataset, applying transformations, and exporting the cleaned version for use. 
