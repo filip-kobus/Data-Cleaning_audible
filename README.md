@@ -37,15 +37,10 @@ The repository contains the following files:
 
 ## Requirements
 
-- SQL or a similar tool that can process `.sql` files and perform data transformations.
+-  MySQL or a similar tool that can process `.sql` files and perform data transformations.
 - A data analysis tool (e.g., Python, Excel) to load and work with the cleaned `.csv` files.
 
 ## Kaggle Dataset
 
 The cleaned dataset and the SQL steps used in this project are also available on Kaggle. You can view and download the dataset here:  
 [Kaggle Dataset - Audible Dataset Cleaning SQL](https://www.kaggle.com/datasets/fkobus/audible-dataset-cleaning-sql)
-
-## Future Work
-
-- Additional transformations or data enhancements could be applied, depending on the final use case of the cleaned data.
-- Integration with a data visualization or reporting tool for further insights.
